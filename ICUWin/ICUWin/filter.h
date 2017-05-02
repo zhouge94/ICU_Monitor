@@ -1,5 +1,6 @@
 #ifndef FILTER_H
 #define FILTER_H
+#include "qlist.h"
 class FIR_Filter
 {
 public:
@@ -50,15 +51,17 @@ private:
     double  MaxKey;
 
 };
-extern class FIR_Filter filter_bandpass1;
-extern class FIR_Filter filter_bandpass2;
-extern class FIR_Filter filter_low1;
+extern class FIR_Filter filter_ecg;
+extern class FIR_Filter filter_hx;
+extern class FIR_Filter filter_mbrr;
+extern class FIR_Filter filter_mbri;
+
 extern class FindMinMax FindMinMax_mb;
 extern class FindMinMax FindMinMax_ecg;
 
-extern double firA[50];
+extern double fir_mb[50];
 extern double firB[250];
 extern double firC[100];
-double ZhongZhiFilter(int N,double *DATE_RAW );
+double ZhongZhiFilter(int N0, QList<double>DATE_RAW );
 
 #endif // FILTER_H

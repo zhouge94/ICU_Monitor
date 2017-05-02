@@ -50,16 +50,9 @@ void DataReplay::setupRealtimeData(QCustomPlot *customPlot)
 }
 void DataReplay::Play(void)
 {
-        double key[20000];
-        double value[20000];
-        double value_2[20000];
-
         FileParse fd;
         Sheet temp,temp2;
-        int i,t0=10,t1=20,fs_ecg=500,fs_mb=252;
-        double *p_key=key;
-        double *p_value=value;
-        double *p_value2=value_2;
+        int i,t0=10,t1=40,fs_ecg=500,fs_mb=252;
         QList<double>ecg_t,ecg_d,mb_t,mb_drr,mb_dri;
         if(!fd.parseCSV("Data/20170324-184544_ZG_ecg.csv",&temp))
         {
@@ -81,11 +74,12 @@ void DataReplay::Play(void)
             QString a=temp2.data.at(i).at(0);
             mb_t.append((double)(a.toFloat()));
             a=temp2.data.at(i).at(1);
-            mb_drr.append((double)(a.toFloat()));
+            mb_drr.append((double)filter_mbrr.RealFIR((a.toFloat())));
             a=temp2.data.at(i).at(2);
             mb_dri.append((double)(a.toFloat()));
         }
         //load all data
+
         QList<double> show_ecg_t,show_ecg_d,show_ecg_d2,max_key_ecg;
         for(i=fs_ecg*t0;i<fs_ecg*t1;i++)
         {
@@ -95,31 +89,11 @@ void DataReplay::Play(void)
         //select data t0 to t1 of ecg
         mapminmax.GetMinMax(show_ecg_d);
         mapminmax.Change(show_ecg_d,&show_ecg_d2);
-        FindMinMax_ecg.Set(0);
         findpeaks.Find(show_ecg_d2,show_ecg_t,&max_key_ecg);
-        for(i=0;i<fs_ecg*t1-fs_ecg*t0;i++)
-        {
-            if(FindMinMax_ecg.input(show_ecg_t.at(i),show_ecg_d2.at(i)))
-            {
-                std::cout<<"success get max ecg --------------t:"<<FindMinMax_ecg.maxkey<<std::endl;
-                sys.maxecg_t.append(FindMinMax_ecg.maxkey);
-                sys.maxecg_v.append(FindMinMax_ecg.max);
-                QCPItemTracer *groupTracer = new QCPItemTracer(ui->plot);
-                groupTracer->setGraph(ui->plot->graph(0));
-                groupTracer->setGraphKey(FindMinMax_ecg.maxkey);
-                groupTracer->setInterpolating(true);
-                groupTracer->setStyle(QCPItemTracer::tsCircle);
-                groupTracer->setPen(QPen(Qt::red));
-                groupTracer->setBrush(Qt::red);
-                groupTracer->setSize(7);
 
-            }
-
-            ui->plot->graph(0)->addData(show_ecg_t.at(i),show_ecg_d2.at(i));
-            ui->plot->graph(0)->rescaleValueAxis(false,true);
-            ui->plot->xAxis->setRange(t0,t1);
-            if(!(i%50))ui->plot->replot();
-        }
+        ui->plot->graph(0)->addData(show_ecg_t.toVector(),show_ecg_d2.toVector());
+        ui->plot->xAxis->setRange(t0,t1);
+        ui->plot->replot();
         //end of the ecg data
         QList<double> show_mb_t,show_mb_d,show_mb_d2,max_key_mb;
         for(i=fs_mb*t0;i<fs_mb*t1;i++)
@@ -134,29 +108,34 @@ void DataReplay::Play(void)
         FindMinMax_ecg.Set(0);
         findpeaks.Find(show_mb_d2,show_mb_t,&max_key_mb);
 
-        for(i=0;i<fs_mb*t1-fs_mb*t0;i++)
+        ui->plot->graph(1)->addData(show_mb_t.toVector(),show_mb_d2.toVector());
+        // rescale value (vertical) axis to fit the current data:
+        for(i=0;i<max_key_ecg.count();i++)
         {
-/*            if(FindMinMax_mb.input(show_mb_t.at(i),show_mb_d2.at(i)))
-            {
-                std::cout<<"success get max mb -------------t:"<<FindMinMax_mb.maxkey<<std::endl;
-                sys.maxmb_t.append(FindMinMax_mb.maxkey);
-                sys.maxmb_v.append(FindMinMax_mb.max);
-                QCPItemTracer *groupTracer = new QCPItemTracer(ui->plot);
-                groupTracer->setGraph(ui->plot->graph(1));
-                groupTracer->setGraphKey(FindMinMax_mb.maxkey);
-                groupTracer->setInterpolating(true);
-                groupTracer->setStyle(QCPItemTracer::tsCircle);
-                groupTracer->setPen(QPen(Qt::green));
-                groupTracer->setBrush(Qt::green);
-                groupTracer->setSize(7);
-
-            }*/
-            ui->plot->graph(1)->addData(show_mb_t.at(i),show_mb_d2.at(i));
-            // rescale value (vertical) axis to fit the current data:
-            if(!(i%50))ui->plot->replot();
+            QCPItemTracer *groupTracer = new QCPItemTracer(ui->plot);
+            groupTracer->setGraph(ui->plot->graph(0));
+            groupTracer->setGraphKey(max_key_ecg[i]);
+            groupTracer->setInterpolating(true);
+            groupTracer->setStyle(QCPItemTracer::tsCircle);
+            groupTracer->setPen(QPen(Qt::red));
+            groupTracer->setBrush(Qt::red);
+            groupTracer->setSize(7);
         }
-
+        for(i=0;i<max_key_mb.count();i++)
+        {
+            QCPItemTracer *groupTracer = new QCPItemTracer(ui->plot);
+            groupTracer->setGraph(ui->plot->graph(1));
+            groupTracer->setGraphKey(max_key_mb[i]);
+            groupTracer->setInterpolating(true);
+            groupTracer->setStyle(QCPItemTracer::tsCircle);
+            groupTracer->setPen(QPen(Qt::blue));
+            groupTracer->setBrush(Qt::blue);
+            groupTracer->setSize(7);
+        }
         //XueYa();
+        double xueya_T=XueYa_T(max_key_ecg,max_key_mb);
+        ui->plot->replot();
+        ui->Ed_info->setText(QString("Ave_T=%1").arg(xueya_T));
 
 }
 

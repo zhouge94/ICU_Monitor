@@ -16,9 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     setupRealtimeData(ui->Plot0);
     setupRealtimeData(ui->Plot1);
-    setupRealtimeData_show1(ui->plot1_xinlv);
     setupRealtimeData_show1(ui->plot1_huxi);
     setupRealtimeData_show1(ui->plot1_tiwei);
+    setupRealtimeData_show1(ui->plot1_xinlv);
+
 
     connect(&SecondTimer, SIGNAL(timeout()), this, SLOT(SecondCallBack()));//the callback for seconds to do sth
     connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
@@ -26,9 +27,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_gethard,SIGNAL(triggered()),this,SLOT(GetHardSudoCallBack()));
 /////////////////////////////////////////////////////////////////////////////////////////
     sys.ecgrate=500;
-    filter_bandpass1.SetFilterA(firA,50);
-    filter_bandpass2.SetFilterA(firC,100);
-    filter_low1.SetFilterA(firB,250);
+    sys.plot_range_TRange_EcgMb=5;
+    sys.plot_range_TRange_Hx=30;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+    filter_mbrr.SetFilterA(fir_mb,50);
+    filter_ecg.SetFilterA(firC,100);
+    filter_hx.SetFilterA(firB,250);
 
     FindMinMax_ecg.Set(-400);
     FindMinMax_mb.Set2(250,200,200);

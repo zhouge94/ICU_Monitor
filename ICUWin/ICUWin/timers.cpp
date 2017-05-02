@@ -4,10 +4,10 @@ void MainWindow::realtimeDataSlot_show1()
     static QTime time(QTime::currentTime());
     // calculate two new data points:
     double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+    static double lastPointKey = 0;
     static double ecg_key;
     static double mb_key;
     static double hx_key;
-    static double lastPointKey = 0;
     QVector<double> vector_ecgkey;
     QVector<double> vector_ecgdata;
     QVector<double> vector_mbkey;
@@ -34,7 +34,7 @@ void MainWindow::realtimeDataSlot_show1()
 
             for(i=i0;i<i1;i++)
             {
-                if(!(i%4))
+                if(!(i%5))
                 {
                     ecg_key=sys.ecgdata_t.at(i);
                     vector_ecgkey.append(ecg_key);
@@ -55,57 +55,51 @@ void MainWindow::realtimeDataSlot_show1()
             }
 
             // add data to lines:
-            ui->plot1_xinlv->graph(0)->addData(vector_ecgkey,vector_ecgdata,0);
-            // rescale value (vertical) axis to fit the current data:
+            ui->plot1_xinlv->graph(0)->addData(vector_ecgkey,vector_ecgdata);
             ui->plot1_xinlv->graph(0)->rescaleValueAxis(false,true);
-            // add data to lines:
-            ui->plot1_tiwei->graph(0)->addData(vector_mbkey,vector_mbdata,0);
-            // rescale value (vertical) axis to fit the current data:
+
+            ui->plot1_tiwei->graph(0)->addData(vector_mbkey,vector_mbdata);
             ui->plot1_tiwei->graph(0)->rescaleValueAxis(false,true);
-            // add data to lines:
-            ui->plot1_huxi->graph(0)->addData(vector_hxkey,vector_hxdata,0);
-            // rescale value (vertical) axis to fit the current data:
+
+            ui->plot1_huxi->graph(0)->addData(vector_hxkey,vector_hxdata);
             ui->plot1_huxi->graph(0)->rescaleValueAxis(true,false);
-            //ui->plot1_xinlv->graph(0)->getValueRange()
-            //ui->plot1_xinlv->yAxis->setRange(-1000,10000);
+
             lastPointKey = key;
-        }
 
-        static double LastEcgPointKey=0;
-        static double LastmbPointKey=0;
-        static double LastHxPointKey=0;
-        static double FirstIn=0;
-        if(FirstIn==0)
-        {
-            ui->plot1_xinlv->xAxis->setRange(0,5);
-            ui->plot1_tiwei->xAxis->setRange(0,5);
-            ui->plot1_huxi->xAxis->setRange(0,10);
-            FirstIn++;
-        }
-        if(key-LastHxPointKey > 10)
-        {
-            ui->plot1_huxi->xAxis->setRange(hx_key,hx_key+10);
-            LastHxPointKey=key;
-        }
-        if(key-LastEcgPointKey > 5)
-        {
-            ui->plot1_xinlv->xAxis->setRange(ecg_key,ecg_key+5);
-            //ui->plot1_tiwei->xAxis->setRange(ecg_key,ecg_key+5);
-            LastEcgPointKey=key;
-            //LastmbPointKey=key;
-        }
-        if(key-LastmbPointKey > 5)
-        {
-            printf("begin to change scale :%f \n",mb_key);
-            ui->plot1_tiwei->xAxis->setRange(mb_key,mb_key+6);
-            LastmbPointKey=key;
-        }
 
-        // make key axis range scroll with the data (at a constant range size of 8):
-        //ui->Plot1->yAxis->setRange(ui->doubleSpinBox_YScale1_->tex1t().toFloat(), ui->doubleSpinBox_YScale2_->text().toFloat());
-        ui->plot1_xinlv->replot();
-        ui->plot1_huxi->replot();
-        ui->plot1_tiwei->replot();
+            static double LastEcgPointKey=0;
+            static double LastmbPointKey=0;
+            static double LastHxPointKey=0;
+            static double FirstIn=0;
+            if(FirstIn==0)
+            {
+                ui->plot1_xinlv->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
+                ui->plot1_tiwei->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
+                ui->plot1_huxi->xAxis->setRange(0,sys.plot_range_TRange_Hx);
+                FirstIn++;
+            }
+
+            if(key-LastEcgPointKey > sys.plot_range_TRange_EcgMb)
+            {
+                ui->plot1_xinlv->xAxis->setRange(ecg_key,ecg_key+sys.plot_range_TRange_EcgMb);
+                ui->plot1_tiwei->xAxis->setRange(ecg_key,ecg_key+sys.plot_range_TRange_EcgMb);
+                LastEcgPointKey=key;
+                LastmbPointKey=key;
+            }
+            if(key-LastmbPointKey > sys.plot_range_TRange_EcgMb)
+            {
+                ui->plot1_tiwei->xAxis->setRange(mb_key,mb_key+sys.plot_range_TRange_EcgMb);
+                LastmbPointKey=key;
+            }
+            if(key-LastHxPointKey > sys.plot_range_TRange_Hx)
+            {
+                ui->plot1_huxi->xAxis->setRange(hx_key,hx_key+sys.plot_range_TRange_Hx);
+                LastHxPointKey=key;
+            }
+            ui->plot1_xinlv->replot();
+            ui->plot1_huxi->replot();
+            ui->plot1_tiwei->replot();
+        }
     }
 }
 
@@ -188,6 +182,8 @@ void MainWindow::SecondCallBack()
     }
     ui->show1_tiwei->setText(tiwei);
     //////////////////////////////////////////////////////
+    /// \brief groupTracer
+    /*
     QCPItemTracer *groupTracer = new QCPItemTracer(ecgPlot);
     if(sys.maxecg_t.count())
     {
@@ -199,10 +195,10 @@ void MainWindow::SecondCallBack()
         groupTracer->setBrush(Qt::red);
         groupTracer->setSize(7);
     }
+    QCPItemTracer *groupTracer = new QCPItemTracer(mbPlot);
     if(sys.maxmb_t.count())
     {
 
-        groupTracer = new QCPItemTracer(mbPlot);
         groupTracer->setGraph(mbPlot->graph(0));
         groupTracer->setGraphKey(sys.maxmb_t.last());
         groupTracer->setInterpolating(true);
@@ -211,6 +207,7 @@ void MainWindow::SecondCallBack()
         groupTracer->setBrush(Qt::green);
         groupTracer->setSize(7);
     }
+    */
     /////////////////////////////////////////////////////////
 }
 

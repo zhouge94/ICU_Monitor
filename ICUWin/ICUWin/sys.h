@@ -73,12 +73,19 @@ typedef struct
     int uart_ecg_count=0;
     int count;
     int count2;
+
+    double plot_range_TRange_EcgMb;
+    double plot_range_TRange_Hx;
+    double plot_range_V0_Ecg;
+    double plot_range_V1_Ecg;
+    double plot_range_VRange_Ecg;
 }sys_S;
 extern sys_S sys;
 
 void AddData(unsigned char chx,float data);
 double GetTimeToDouble(void);
 float XueYa(void);
+double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t);
 void SaveData(QString filename);
 int myexec(QString cmd, QList<QString> &resvec);
 #endif // SYS_H

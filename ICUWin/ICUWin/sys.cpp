@@ -14,7 +14,7 @@ void AddData(unsigned char chx,float data)
         case 9:
             sys.hxtime+=0.01;
             sys.hxdata_t.append(sys.hxtime);
-            sys.hx=filter_bandpass2.RealFIR(data);;
+            sys.hx=filter_hx.RealFIR(data);;
             //sys.hx=(data);;
             sys.hxdata.append(sys.hx);
             sys.hxdata_index_cur=sys.hxdata.count();
@@ -103,7 +103,7 @@ float XueYa(void)
     }
     if((count-1)>10)
     {
-        sys.XueYa_T=ZhongZhiFilter(count-1,difft);
+        //sys.XueYa_T=ZhongZhiFilter(count-1,difft);
         std::cout<<"Find XueYa T:"<<sys.XueYa_T<<",P:"<<sys.XueYa_T*100+60<<std::endl;
         return sys.XueYa_T;
     }else
@@ -111,6 +111,30 @@ float XueYa(void)
         std::cout<<"Error! Just Found T of "<<count<<std::endl;
     }
 }
+double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t)
+{
+    QList<double> T;
+    int i=0,j=0;
+    while(1)
+    {
+        if(i>=(ecg_max_t.count()-2)||j>=(mb_max_t.count()-2))break;
+        if(ecg_max_t[i]<=mb_max_t[j]&&ecg_max_t[i+1]>=mb_max_t[j])
+        {
+            T.append(mb_max_t[j]-ecg_max_t[i]);
+            i++;
+            j++;
+        }
+        else if(ecg_max_t[i]>mb_max_t[j]) j++;
+        else if(ecg_max_t[i+1]<mb_max_t[j]) i++;
+    }
+    double ave_T=ZhongZhiFilter(2,T);
+    std::cout<<"found T of "<<T.count()<<",ave_T="<<ave_T<<" :";
+    for(i=0;i<T.count();i++)std::cout<<T[i]<<" ";
+    std::cout<<std::endl;
+    return ave_T;
+
+}
+
 double GetTimeToDouble(void)
 {
     struct  timeval tv;
