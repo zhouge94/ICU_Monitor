@@ -15,6 +15,7 @@
 #include "iostream"
 #include "filter.h"
 #include "sysseting.h"
+#include "datareplay.h"
 
 namespace Ui {
 class MainWindow;
@@ -29,7 +30,8 @@ public:
     void Outinfo(const QString &msg);
     void OutOneinfo(const QString &msg);
     ~MainWindow();
-    SysSeting sysseting;
+    SysSeting ui_sysseting;
+    DataReplay ui_dp;
 private slots:
     void UartCallback();
     void UartCallback2();
@@ -71,6 +73,7 @@ private:
     My_Uart uart;
     My_Uart uart2;
     Ui::MainWindow *ui;
+
     int Uart_fd;
     int Uart_fd2;
 

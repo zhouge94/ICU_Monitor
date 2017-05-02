@@ -50,61 +50,18 @@ void FIR_Filter::SetFilterA(double *AA,int NN)
 FindMinMax::FindMinMax()
 {
     LastV=0;
-    level_diff_=-5.0;
     IsFindLevel=false;
     N=500;
     N0=600;
     index=0;
-    level_v_=2000;
+    level_v_=0;
 }
 
 FindMinMax::~FindMinMax()
 {
 }
 
-bool FindMinMax::input(double key, float v)
-{
-    int i;
-    Diff[1]=Diff[0];
-    Diff[0]=v-LastV;
-    if((Diff[1]>=0)&&(Diff[0]<=0))
-    {
-        max=LastV;
-        maxkey=LastKey;
-    }
-    LastKey=key;
-    LastV=v;
-
-    if((Diff[1]>=level_diff_)&&(Diff[0]<=level_diff_)&&((key-Lastmaxkey)>0.4))
-    {
-        IsFindLevel=true;
-    }
-    if((Diff[1]<=0)&&(Diff[0]>=0)&&IsFindLevel)
-    {
-        IsFindLevel=false;
-        min=LastV;
-        minkey=LastKey;
-        DiffMaxKey=maxkey-Lastmaxkey;
-        DiffMinKey=minkey-Lastminkey;
-        DiffMinMaxKey=minkey-maxkey;
-        DiffMaxMinKey=maxkey-minkey;
-
-        Lastminkey=minkey;
-        Lastmaxkey=maxkey;
-        /*
-        std::cout<<count<<"========================================"<<std::endl;
-        std::cout<<"diff:"<<Diff[1]<<",key:"<<LastKey<<std::endl;
-        std::cout<<"max:"<<max<<",key:"<<maxkey<<std::endl;
-        std::cout<<"min:"<<min<<",key:"<<minkey<<std::endl;
-        std::cout<<"heartrate:"<<60.0/DiffMaxKey<<",DiffMinMaxKey:"<<DiffMinMaxKey<<std::endl;
-        */
-        count++;
-        return 1;
-    }
-    return 0;
-}
-
-bool FindMinMax::input2(double key, float in)
+bool FindMinMax::input(double key, float in)
 {
     bool IsFind=false;
     if(count>N0)
@@ -189,9 +146,9 @@ bool FindMinMax::input2(double key, float in)
                 MaxN=MinN;
             }
 
-        }//to find the fisrt max value on the window0
+        }//to find the fisrt min value on the window0
     }
-    count ++;
+    count++;
     return IsFind;
 }
 

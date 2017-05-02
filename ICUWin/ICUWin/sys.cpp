@@ -24,7 +24,7 @@ void AddData(unsigned char chx,float data)
             sys.ecgtime+=0.002;
             value2=data;
             //value2=filter_low1.RealFIR(data);
-            if(FindMinMax_ecg.input2(sys.ecgtime,value2))
+            if(FindMinMax_ecg.input(sys.ecgtime,value2))
             {
                 //std::cout<<"success get max ecg -------t:"<<FindMinMax_ecg.maxkey<<",v:"<<FindMinMax_ecg.max<<std::endl;
                 sys.maxecg_t.append(FindMinMax_ecg.maxkey);

@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     page_debug.cpp \
     page_show1.cpp \
     sysseting.cpp \
-    datareplay.cpp
+    datareplay.cpp \
+    mapminmax.cpp \
+    findpeaks.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -32,7 +34,9 @@ HEADERS  += mainwindow.h \
     filter.h \
     my_cvs.h \
     sysseting.h \
-    datareplay.h
+    datareplay.h \
+    mapminmax.h \
+    findpeaks.h
 
 FORMS    += mainwindow.ui \
     sysseting.ui \

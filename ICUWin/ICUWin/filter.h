@@ -18,8 +18,7 @@ class FindMinMax
 public:
     FindMinMax();
     ~FindMinMax();
-    bool input(double key,float v);
-    bool input2(double key,float v);
+    bool input(double key, float in);
     void Set(double difflevel);
     float level_diff_;
     float level_v_;
