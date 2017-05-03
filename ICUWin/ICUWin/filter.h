@@ -60,7 +60,7 @@ extern class FindMinMax FindMinMax_mb;
 extern class FindMinMax FindMinMax_ecg;
 
 extern double fir_mb[50];
-extern double firB[250];
+extern double fir_ecg[100];
 extern double firC[100];
 double ZhongZhiFilter(int N0, QList<double>DATE_RAW );
 

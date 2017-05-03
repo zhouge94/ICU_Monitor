@@ -72,13 +72,20 @@ void MainWindow::on_pushButton_UartAuto_clicked()
 void MainWindow::setupRealtimeData_show1(QCustomPlot *customPlot)
 {
 
-    customPlot->addGraph(); // blue line
     //customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
     QPen pen;
+
+    customPlot->addGraph(); // blue line
     pen.setWidth(2);
     pen.setColor(QColor(200, 220, 250));
     customPlot->graph(0)->setPen(pen);
     customPlot->graph(0)->setBrush(QBrush(QColor(255,200,20,70)));
+
+    customPlot->addGraph(); // blue line
+    pen.setWidth(1);
+    pen.setColor(QColor(200, 220, 250));
+    customPlot->graph(1)->setPen(pen);
+    customPlot->graph(1)->setBrush(QBrush(QColor(255,200,20,70)));
 
     // set some pens, brushes and backgrounds:
     customPlot->xAxis->setBasePen(QPen(Qt::white, 1));

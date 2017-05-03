@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 #include "string.h"
+#include "mapminmax.h"
+#include "findpeaks.h"
 typedef struct
 {
     bool IsBeginRecode;
@@ -16,6 +18,8 @@ typedef struct
     float FPS1;
     float FPS2;
     float FPS3;
+
+    float ecg_hq;
     float RecievedFloatArray[500];
     QList<double> common_t;
     QList<double> tiwendata;

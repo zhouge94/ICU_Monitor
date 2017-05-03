@@ -5,7 +5,7 @@
 sys_S sys;
 void AddData(unsigned char chx,float data)
 {
-    float value2;
+    float value,value2;
     sys.RecievedFloatArray[chx]=data;
     if(sys.IsBeginRecode)
     {
@@ -22,18 +22,22 @@ void AddData(unsigned char chx,float data)
         case 10:
             sys.count++;
             sys.ecgtime+=0.002;
-            value2=data;
-            //value2=filter_low1.RealFIR(data);
-            if(FindMinMax_ecg.input(sys.ecgtime,value2))
+            if(sys.ecg_hq==0)value2=0;
+            else value2=data;
+            value=filter_ecg.RealFIR(value2);
+            //value=value2;
+            if(FindMinMax_ecg.input(sys.ecgtime,value))
             {
                 //std::cout<<"success get max ecg -------t:"<<FindMinMax_ecg.maxkey<<",v:"<<FindMinMax_ecg.max<<std::endl;
                 sys.maxecg_t.append(FindMinMax_ecg.maxkey);
                 sys.maxecg_v.append(FindMinMax_ecg.max);
-
             }
-            sys.ecgdata.append(value2);
+            sys.ecgdata.append(value);
             sys.ecgdata_t.append(sys.ecgtime);
             sys.ecgdata_index_cur=sys.ecgdata.count();
+            break;
+        case 11:
+            sys.ecg_hq=data;
             break;
         case 12:
             sys.ssxl=data;
