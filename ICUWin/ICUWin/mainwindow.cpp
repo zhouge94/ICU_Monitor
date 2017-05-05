@@ -27,11 +27,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_gethard,SIGNAL(triggered()),this,SLOT(GetHardSudoCallBack()));
 /////////////////////////////////////////////////////////////////////////////////////////
     sys.ecgrate=500;
-    sys.plot_range_TRange_EcgMb=3;
+    sys.mbrate=250;
+    sys.plot_range_TRange_EcgMb=5;
     sys.plot_range_TRange_Hx=30;
 
 /////////////////////////////////////////////////////////////////////////////////////////
     filter_mbrr.SetFilterA(fir_mb,50);
+    filter_mbri.SetFilterA(fir_mb,50);
     filter_ecg.SetFilterA(fir_ecg,100);
     filter_hx.SetFilterA(fir_mb,50);
 

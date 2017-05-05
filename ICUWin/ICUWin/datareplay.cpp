@@ -52,7 +52,7 @@ void DataReplay::Play(void)
 {
         FileParse fd;
         Sheet temp,temp2;
-        int i,t0=10,t1=40,fs_ecg=500,fs_mb=252;
+        int i,t0=15,t1=20,fs_ecg=500,fs_mb=252;
         QList<double>ecg_t,ecg_d,mb_t,mb_drr,mb_dri;
         if(!fd.parseCSV("Data/20170324-184544_ZG_ecg.csv",&temp))
         {

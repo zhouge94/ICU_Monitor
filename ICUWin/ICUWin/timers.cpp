@@ -15,22 +15,40 @@ void MainWindow::realtimeDataSlot_show1()
     QVector<double> vector_mbdata;
     QVector<double> vector_hxkey;
     QVector<double> vector_hxdata;
-    static QCPItemTracer *groupTracer = new QCPItemTracer(ui->plot1_xinlv);
+    static QCPItemTracer *ecgTracer = new QCPItemTracer(ui->plot1_xinlv);
+    static QCPItemTracer *mbTracer = new QCPItemTracer(ui->plot1_tiwei);
+    static QCPItemTracer *hxTracer = new QCPItemTracer(ui->plot1_huxi);
+    static double StartT_ecg;
+    static double StartT_mb;
+    static double StartT_hx;
 
     int i,i0,i1,i2,i3,i4,i5;
     if(sys.IsBeginRecode)
     {
         if (key-lastPointKey > 0.02) // at most add point every 20 ms
         {
-            static double StartT;
             if(FirstIn==0)
             {
-                groupTracer->setGraph(ui->plot1_xinlv->graph(0));
-                groupTracer->setInterpolating(true);
-                groupTracer->setStyle(QCPItemTracer::tsCircle);
-                groupTracer->setPen(QPen(Qt::green));
-                groupTracer->setBrush(Qt::green);
-                groupTracer->setSize(10);
+                ecgTracer->setGraph(ui->plot1_xinlv->graph(0));
+                ecgTracer->setInterpolating(true);
+                ecgTracer->setStyle(QCPItemTracer::tsCircle);
+                ecgTracer->setPen(QPen(Qt::green));
+                ecgTracer->setBrush(Qt::green);
+                ecgTracer->setSize(10);
+
+                mbTracer->setGraph(ui->plot1_tiwei->graph(0));
+                mbTracer->setInterpolating(true);
+                mbTracer->setStyle(QCPItemTracer::tsCircle);
+                mbTracer->setPen(QPen(Qt::green));
+                mbTracer->setBrush(Qt::green);
+                mbTracer->setSize(10);
+
+                hxTracer->setGraph(ui->plot1_huxi->graph(0));
+                hxTracer->setInterpolating(true);
+                hxTracer->setStyle(QCPItemTracer::tsCircle);
+                hxTracer->setPen(QPen(Qt::green));
+                hxTracer->setBrush(Qt::green);
+                hxTracer->setSize(10);
 
                 ui->plot1_xinlv->yAxis->setRange(-5000,15000);
                 ui->plot1_xinlv->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
@@ -38,7 +56,9 @@ void MainWindow::realtimeDataSlot_show1()
                 ui->plot1_huxi->xAxis->setRange(0,sys.plot_range_TRange_Hx);
 
                 FirstIn++;
-                StartT=0;
+                StartT_ecg=0;
+                StartT_mb=0;
+                StartT_hx=0;
             }
 
             i0=sys.ecgdata_index_last;
@@ -59,34 +79,45 @@ void MainWindow::realtimeDataSlot_show1()
                 //if(!(i%2))
                 {
                     ecg_key=sys.ecgdata_t.at(i);
-                    vector_ecgkey.append(ecg_key-StartT);
+                    vector_ecgkey.append(ecg_key-StartT_ecg);
                     vector_ecgdata.append(sys.ecgdata.at(i));
                 }
             }
             for(i=i2;i<i3;i++)
             {
                 mb_key=sys.mbridata_t.at(i);
-                vector_mbkey.append(mb_key);
+                vector_mbkey.append(mb_key-StartT_mb);
                 vector_mbdata.append(sys.mbridata.at(i));
             }
             for(i=i4;i<i5;i++)
             {
                 hx_key=sys.hxdata_t.at(i);
-                vector_hxkey.append(hx_key);
+                vector_hxkey.append(hx_key-StartT_hx);
                 vector_hxdata.append(sys.hxdata.at(i));
             }
             // add data to lines:
-            ui->plot1_xinlv->graph(0)->data().data()->remove(vector_ecgkey.first(),vector_ecgkey.last()+0.05);
-            ui->plot1_xinlv->graph(0)->addData(vector_ecgkey,vector_ecgdata);
-            groupTracer->setGraphKey(vector_ecgkey.last());
+            if(vector_ecgkey.count()>0)
+            {
+                ui->plot1_xinlv->graph(0)->data().data()->remove(vector_ecgkey.first(),vector_ecgkey.last()+0.01);
+                ui->plot1_xinlv->graph(0)->addData(vector_ecgkey,vector_ecgdata);
+                ecgTracer->setGraphKey(vector_ecgkey.last());
+            }
 
             //ui->plot1_xinlv->graph(0)->rescaleValueAxis(false,true);
-
-            ui->plot1_tiwei->graph(0)->addData(vector_mbkey,vector_mbdata);
-            ui->plot1_tiwei->graph(0)->rescaleValueAxis(false,true);
-
-            ui->plot1_huxi->graph(0)->addData(vector_hxkey,vector_hxdata);
-            ui->plot1_huxi->graph(0)->rescaleValueAxis(true,false);
+            if(vector_mbkey.count()>0)
+            {
+                ui->plot1_tiwei->graph(0)->data().data()->remove(vector_mbkey.first(),vector_mbkey.last()+0.02);
+                ui->plot1_tiwei->graph(0)->addData(vector_mbkey,vector_mbdata);
+                mbTracer->setGraphKey(vector_mbkey.last());
+                //ui->plot1_tiwei->graph(0)->rescaleValueAxis(false,true);
+            }
+            if(vector_hxkey.count()>0)
+            {
+                ui->plot1_huxi->graph(0)->data().data()->remove(vector_hxkey.first(),vector_hxkey.last()+0.1);
+                ui->plot1_huxi->graph(0)->addData(vector_hxkey,vector_hxdata);
+                hxTracer->setGraphKey(vector_hxkey.last());
+                ui->plot1_huxi->graph(0)->rescaleValueAxis(true,false);
+            }
 
             lastPointKey = key;
 
@@ -95,30 +126,58 @@ void MainWindow::realtimeDataSlot_show1()
             static double LastmbPointKey=0;
             static double LastHxPointKey=0;
 
-            if(key-LastEcgPointKey > sys.plot_range_TRange_EcgMb)
+            if(key-LastEcgPointKey > sys.plot_range_TRange_EcgMb || (key-LastmbPointKey > sys.plot_range_TRange_EcgMb))
             {
-                StartT=ecg_key;
+                if(sys.mbtime<sys.ecgtime)sys.mbtime=sys.ecgtime;
+                else sys.ecgtime=sys.mbtime;
                 LastEcgPointKey=key;
-                LastmbPointKey=key;
-                QList<double>ecg_t_temp,ecg_d_temp;
-                int count=ui->plot1_xinlv->graph(0)->data().data()->size();
-                for(i=0;i<count;i++)
+                QList<double>ecg_t_temp,ecg_d_temp,ecg_d_temp_1;
+                if(vector_ecgkey.count()>0)
                 {
-                    ecg_t_temp.append(ui->plot1_xinlv->graph(0)->data().data()->at(i)->key);
-                    ecg_d_temp.append(ui->plot1_xinlv->graph(0)->data().data()->at(i)->value);
+                    StartT_ecg=ecg_key;
+                    ui->plot1_xinlv->graph(0)->data().data()->removeAfter(sys.plot_range_TRange_EcgMb);
+                    int count=ui->plot1_xinlv->graph(0)->data().data()->size();
+                    for(i=10;i<count-10;i++)
+                    {
+                        ecg_t_temp.append(ui->plot1_xinlv->graph(0)->data().data()->at(i)->key);
+                        ecg_d_temp.append(ui->plot1_xinlv->graph(0)->data().data()->at(i)->value);
+                    }
+                    MapMinMax *mapminmax_t=new MapMinMax;
+                    mapminmax_t->GetMinMax(ecg_d_temp);
+                    mapminmax_t->Change(ecg_d_temp,&ecg_d_temp_1);
+                    if(mapminmax_t->xmax==0&&mapminmax_t->xmin==0)ui->plot1_xinlv->yAxis->setRange(-10000,10000);
+                    else ui->plot1_xinlv->yAxis->setRange(mapminmax_t->xmin-mapminmax_t->xrange*0.1,mapminmax_t->xmax+mapminmax_t->xrange*0.1);
                 }
-                MapMinMax *mapminmax_t=new MapMinMax;
-                mapminmax_t->GetMinMax(ecg_d_temp);
-                ui->plot1_xinlv->yAxis->setRange(mapminmax_t->xmin-mapminmax_t->xrange*0.1,mapminmax_t->xmax+mapminmax_t->xrange*0.1);
-            }
-            if(key-LastmbPointKey > sys.plot_range_TRange_EcgMb)
-            {
-                ui->plot1_tiwei->xAxis->setRange(mb_key,mb_key+sys.plot_range_TRange_EcgMb);
                 LastmbPointKey=key;
+                QList<double>mb_t_temp,mb_d_temp,mb_d_temp_1;
+                if(vector_mbkey.count()>0)
+                {
+                    StartT_mb=mb_key;
+                    ui->plot1_tiwei->graph(0)->data().data()->removeAfter(sys.plot_range_TRange_EcgMb);
+                    int count=(ui->plot1_tiwei->graph(0)->data().data()->size());
+                    for(i=10;i<count-10;i++)
+                    {
+                        mb_t_temp.append(ui->plot1_tiwei->graph(0)->data().data()->at(i)->key);
+                        mb_d_temp.append(ui->plot1_tiwei->graph(0)->data().data()->at(i)->value);
+                    }
+                    MapMinMax *mapminmax_t=new MapMinMax;
+                    mapminmax_t->GetMinMax(mb_d_temp);
+                    mapminmax_t->Change(mb_d_temp,&mb_d_temp_1);
+                    if(mapminmax_t->xmax==0&&mapminmax_t->xmin==0)ui->plot1_tiwei->yAxis->setRange(-10000,10000);
+                    else if(mapminmax_t->xrange<500)ui->plot1_tiwei->yAxis->setRange(mapminmax_t->averge-1000,mapminmax_t->averge+1000);
+                    else ui->plot1_tiwei->yAxis->setRange(mapminmax_t->xmin-mapminmax_t->xrange*0.5,mapminmax_t->xmax+mapminmax_t->xrange*0.5);
+                }
+                FindPeaks *myfindpeaks =new FindPeaks;
+                QList<double>mb_max_t,ecg_max_t;
+                myfindpeaks->Init(100,0.5);
+                myfindpeaks->Find(ecg_d_temp_1,ecg_t_temp,&ecg_max_t);
+                myfindpeaks->Init(50,0.5);
+                myfindpeaks->Find(mb_d_temp_1,mb_t_temp,&mb_max_t);
+                XueYa_T(ecg_max_t,mb_max_t);
             }
             if(key-LastHxPointKey > sys.plot_range_TRange_Hx)
             {
-                ui->plot1_huxi->xAxis->setRange(hx_key,hx_key+sys.plot_range_TRange_Hx);
+                StartT_hx=hx_key;
                 LastHxPointKey=key;
             }
             ui->plot1_xinlv->replot();
@@ -328,9 +387,7 @@ void MainWindow::onCommTimeout()
     if(sys.IsBeginRecode)
     {
         temp=GetTimeToDouble()-sys.StartTime;
-        //sys.ecgtime=temp;
-        //sys.mbtime=temp;
-        //sys.hxtime=temp;
+        sys.hxtime=temp;
         sys.common_t.append(temp);
         sys.tiwendata.append(sys.TiWen);
         sys.rthtdata.append(sys.ssxl);

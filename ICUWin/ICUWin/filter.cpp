@@ -169,14 +169,14 @@ double ZhongZhiFilter(int N0, QList<double> DATE_RAW )
     double value_buf[200],temp;
     double sum=0;
     int count,i,j;
-    if(N0>DATE_RAW.count()/2)return 0;
+    if(N0>=DATE_RAW.count()/2)return 0;
     for(count=0;count<DATE_RAW.count();count++)
     {
         value_buf[count] = DATE_RAW[count];
     }
     for (j=0;j<DATE_RAW.count()-1;j++)
     {
-        for (i=0;i<DATE_RAW.count()-j;i++)
+        for (i=0;i<DATE_RAW.count()-j-1;i++)
         {
             if ( value_buf[i]>value_buf[i+1] )
             {
@@ -186,7 +186,7 @@ double ZhongZhiFilter(int N0, QList<double> DATE_RAW )
             }
         }
     }
-    for(count=N0;count<DATE_RAW.count()-N0;count++)
+    for(count=N0;count<(DATE_RAW.count()-N0);count++)
         sum += value_buf[count];
     return (double)(sum/(DATE_RAW.count()-2*N0));
 }

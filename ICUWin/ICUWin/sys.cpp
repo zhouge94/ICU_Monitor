@@ -6,6 +6,8 @@ sys_S sys;
 void AddData(unsigned char chx,float data)
 {
     float value,value2;
+    static double ecg_T=1/sys.ecgrate;
+    static double mb_T=1/sys.mbrate;
     sys.RecievedFloatArray[chx]=data;
     if(sys.IsBeginRecode)
     {
@@ -21,7 +23,7 @@ void AddData(unsigned char chx,float data)
             break;
         case 10:
             sys.count++;
-            sys.ecgtime+=0.002;
+            sys.ecgtime+=ecg_T;
             if(sys.ecg_hq==0)value2=0;
             else value2=data;
             value=filter_ecg.RealFIR(value2);
@@ -43,9 +45,9 @@ void AddData(unsigned char chx,float data)
             sys.ssxl=data;
             break;
         case 20:
-            sys.mbtime+=0.004;
-            //sys.mbri=filter_bandpass1.RealFIR(65536-((int)data)>>16);
-            sys.mbri=65536-((int)data)>>16;
+            sys.mbtime+=mb_T;
+            sys.mbri=filter_mbri.RealFIR(65536-((int)data)>>16);
+            //sys.mbri=65536-((int)data)>>16;
             sys.mbridata_t.append(sys.mbtime);
             sys.mbridata.append(sys.mbri);
             sys.mbdata_index_cur=sys.mbridata.count();
@@ -121,7 +123,7 @@ double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t)
     int i=0,j=0;
     while(1)
     {
-        if(i>=(ecg_max_t.count()-2)||j>=(mb_max_t.count()-2))break;
+        if(i>=(ecg_max_t.count()-1)||j>=mb_max_t.count())break;
         if(ecg_max_t[i]<=mb_max_t[j]&&ecg_max_t[i+1]>=mb_max_t[j])
         {
             T.append(mb_max_t[j]-ecg_max_t[i]);
@@ -131,7 +133,7 @@ double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t)
         else if(ecg_max_t[i]>mb_max_t[j]) j++;
         else if(ecg_max_t[i+1]<mb_max_t[j]) i++;
     }
-    double ave_T=ZhongZhiFilter(2,T);
+    double ave_T=ZhongZhiFilter(1,T);
     std::cout<<"found T of "<<T.count()<<",ave_T="<<ave_T<<" :";
     for(i=0;i<T.count();i++)std::cout<<T[i]<<" ";
     std::cout<<std::endl;

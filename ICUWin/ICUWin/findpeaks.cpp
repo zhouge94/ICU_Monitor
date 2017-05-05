@@ -36,7 +36,6 @@ int FindPeaks::Find(QList<double>in,QList<double>in_key,QList<double> *max_key)
         {
             if(in.at(indMax[j])>in.at(indMax[j+1]))indMax.removeAt(j+1);
             else indMax.removeAt(j);
-            cout<<"*";
         }else
         {
             j++;

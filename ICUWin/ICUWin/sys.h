@@ -59,6 +59,8 @@ typedef struct
     int hxdata_index_last;
     float ecgdata_FPS;
     double ecgrate;
+    double mbrate;
+    double hxrate;
     double ecgtime=0;
     double mbtime=0;
     double hxtime=0;
