@@ -154,5 +154,10 @@ void MainWindow::ResetAllData()
 
     gettimeofday(&tv,NULL);
     sys.StartTime=tv.tv_sec+tv.tv_usec/1000000.0;
+
+    QDateTime time= QDateTime::currentDateTime();
+    QString timstr=time.toString("开始时间：hh:mm:ss");
+    ui->label_start_time->setText(timstr);
+
 }
 

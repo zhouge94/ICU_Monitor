@@ -32,8 +32,9 @@ typedef struct
     QList<double> tw_gydata;
     QList<double> tw_gzdata;
     QList<double> spo2data;
-    QList<double> xueyadata;
-    QList<double> xueyaTdata;
+    QList<double> xueya_t;
+    QList<double> xueya_data;
+    QList<double> xueya_dataT;
 
     QList<double>ecgdata_t;
     QList<double> ecgdata;
@@ -70,10 +71,6 @@ typedef struct
     double mbri;
     double hx;
     double spo2;
-    double XueYa_T;
-    double XueYa_t;
-    double XueYa_v;
-    double XueYa_v_c;
     double ax,ay,az,gx,gy,gz;
 
     int uart_ecg_count=0;

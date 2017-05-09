@@ -26,14 +26,8 @@ void AddData(unsigned char chx,float data)
             sys.ecgtime+=ecg_T;
             if(sys.ecg_hq==0)value2=0;
             else value2=data;
-            value=filter_ecg.RealFIR(value2);
-            //value=value2;
-            if(FindMinMax_ecg.input(sys.ecgtime,value))
-            {
-                //std::cout<<"success get max ecg -------t:"<<FindMinMax_ecg.maxkey<<",v:"<<FindMinMax_ecg.max<<std::endl;
-                sys.maxecg_t.append(FindMinMax_ecg.maxkey);
-                sys.maxecg_v.append(FindMinMax_ecg.max);
-            }
+            //value=filter_ecg.RealFIR(value2);
+            value=value2;
             sys.ecgdata.append(value);
             sys.ecgdata_t.append(sys.ecgtime);
             sys.ecgdata_index_cur=sys.ecgdata.count();
@@ -55,23 +49,6 @@ void AddData(unsigned char chx,float data)
             sys.mbrrdata_t.append(sys.mbtime);
             sys.mbrrdata.append(sys.mbrr);
             sys.count2++;
-
-/*            if(FindMinMax_mb.input2(sys.mbtime,sys.mbri))
-            {
-               // std::cout<<"Get max mb --t:"<<FindMinMax_mb.maxkey<<",LastT:"<<FindMinMax_mb.maxkey-FindMinMax_ecg.maxkey<<",count:"<<sys.maxmb_t.count()<<std::endl;
-                sys.maxmb_t.append(FindMinMax_mb.maxkey);
-                sys.maxmb_v.append(FindMinMax_mb.max);
-                sys.XueYa_v_c=(FindMinMax_mb.maxkey-FindMinMax_ecg.maxkey)*100+60;
-
-            }
-            if(sys.maxmb_t.count()>20)
-            {
-                sys.XueYa_v=XueYa()*100+60;
-                sys.maxmb_t.clear();
-                sys.maxmb_v.clear();
-                sys.maxecg_t.clear();
-                sys.maxecg_v.clear();
-            }*/
             break;
         case 21:
             break;
@@ -84,6 +61,7 @@ void AddData(unsigned char chx,float data)
     }
 
 }
+/*
 float XueYa(void)
 {
     double difft[50];
@@ -117,6 +95,7 @@ float XueYa(void)
         std::cout<<"Error! Just Found T of "<<count<<std::endl;
     }
 }
+*/
 double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t)
 {
     QList<double> T;
@@ -152,7 +131,7 @@ double GetTimeToDouble(void)
 
 void SaveData(QString filename)
 {
-    Sheet ecg_sheet,mb_sheet,mpu6050_sheet,huxi_sheet,common_sheet;
+    Sheet ecg_sheet,mb_sheet,xueya_sheet,mpu6050_sheet,huxi_sheet,common_sheet;
     int i;
     FileParse fd;
     QStringList a;
@@ -176,6 +155,16 @@ void SaveData(QString filename)
         mb_sheet.data.append(a);
     }
     fd.generateCSV(QString("Data/")+filename+QString("_mb.csv"),mb_sheet);
+    //save xueya data
+    for(i=0;i<sys.xueya_t.count();i++)
+    {
+        a.clear();
+        a.append(QString("%1").arg(sys.xueya_t.at(i),7,'f',6,' '));
+        a.append(QString("%1").arg(sys.xueya_dataT.at(i),12,'f',2,' '));
+        a.append(QString("%1").arg(sys.xueya_data.at(i),12,'f',2,' '));
+        mb_sheet.data.append(a);
+    }
+    fd.generateCSV(QString("Data/")+filename+QString("_xueya.csv"),xueya_sheet);
     //save huxi data
     for(i=0;i<sys.hxdata_t.count();i++)
     {
@@ -207,8 +196,6 @@ void SaveData(QString filename)
         a.append(QString("%1").arg(sys.rthtdata.at(i),12,'f',2,' '));
         a.append(QString("%1").arg(sys.pjhtdata.at(i),12,'f',2,' '));
         a.append(QString("%1").arg(sys.tiwendata.at(i),12,'f',2,' '));
-        a.append(QString("%1").arg(sys.xueyadata.at(i),12,'f',2,' '));
-        a.append(QString("%1").arg(sys.xueyaTdata.at(i),12,'f',2,' '));
         common_sheet.data.append(a);
     }
     fd.generateCSV(QString("Data/")+filename+QString("_common.csv"),common_sheet);

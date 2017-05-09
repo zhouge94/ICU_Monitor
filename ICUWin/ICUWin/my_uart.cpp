@@ -381,10 +381,11 @@ unsigned char My_Uart::RecievetoFloatArray(unsigned char Byte)
         } else
         {
             printf("check sum err Getsum:%d,Checksum:%d DataAddr:%d \r\n",Byte,sum,RecievedByteArray[0]); //error
+            AddData(RecievedByteArray[0],RecievedFloatArray[RecievedByteArray[0]]);
             return 0xfe ;
         }
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(RecievedState ==21 && NotTakeData)
     {
         NotTakeData = false;

@@ -169,7 +169,7 @@ double ZhongZhiFilter(int N0, QList<double> DATE_RAW )
     double value_buf[200],temp;
     double sum=0;
     int count,i,j;
-    if(N0>=DATE_RAW.count()/2)return 0;
+    if(N0*2>=DATE_RAW.count())return 0;
     for(count=0;count<DATE_RAW.count();count++)
     {
         value_buf[count] = DATE_RAW[count];

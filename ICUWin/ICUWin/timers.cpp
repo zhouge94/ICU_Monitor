@@ -173,7 +173,20 @@ void MainWindow::realtimeDataSlot_show1()
                 myfindpeaks->Find(ecg_d_temp_1,ecg_t_temp,&ecg_max_t);
                 myfindpeaks->Init(50,0.5);
                 myfindpeaks->Find(mb_d_temp_1,mb_t_temp,&mb_max_t);
-                XueYa_T(ecg_max_t,mb_max_t);
+                double xueya_t=XueYa_T(ecg_max_t,mb_max_t);
+                if(xueya_t>0)
+                {
+                    double XueYa_v=xueya_t*100;
+                    OutOneinfo(QString("有效脉搏波延时时间： %1 s").arg(xueya_t));
+                    sys.xueya_data.append(XueYa_v);
+                    sys.xueya_dataT.append(xueya_t);
+                    sys.xueya_t.append(sys.ecgtime);
+                }
+                else
+                {
+                    OutOneinfo("无效");
+                }
+
             }
             if(key-LastHxPointKey > sys.plot_range_TRange_Hx)
             {
@@ -242,7 +255,7 @@ void MainWindow::SecondCallBack()
     }
     if(i++%2)
     {
-        std::cout<<"rate1:"<<sys.count<<",rate1:"<<sys.count2<<std::endl;
+        //std::cout<<"rate1:"<<sys.count<<",rate1:"<<sys.count2<<std::endl;
         sys.count=0;
         sys.count2=0;
     }
@@ -250,8 +263,8 @@ void MainWindow::SecondCallBack()
     ui->show1_ssxl->setText(QString("%1").arg(sys.ssxl,5,'f',1,' '));
     ui->show1_pjxl->setText(QString("%1").arg(sys.pjxl,5,'f',1,' '));
     ui->show1_jkzk->setText(QString("%1").arg(sys.spo2,5,'f',1,' '));
-    ui->show1_ssy->setText(QString("%1").arg(sys.XueYa_v,5,'f',1,' '));
-    ui->show1_szy->setText(QString("%1").arg(sys.XueYa_v_c,5,'f',1,' '));
+    if(sys.xueya_data.count())ui->show1_ssy->setText(QString("%1").arg(sys.xueya_data.last(),5,'f',1,' '));
+    if(sys.xueya_data.count())ui->show1_szy->setText(QString("%1").arg(sys.xueya_data.last(),5,'f',1,' '));
     QString tiwei;
     if(sys.ax>=sys.ay&&sys.ax>=sys.az)
     {
@@ -375,6 +388,9 @@ void MainWindow::realtimeDataSlot()
 void MainWindow::onCommTimeout()
 {
     double temp;
+    QDateTime time= QDateTime::currentDateTime();
+    QString timstr=time.toString("yyyy-MM-dd hh:mm:ss");
+    ui->label_current_time->setText(timstr);
     CommTimer.start(100);
     sys.TiWen=sys.RecievedFloatArray[8];
     sys.ax=sys.RecievedFloatArray[0];
@@ -392,8 +408,6 @@ void MainWindow::onCommTimeout()
         sys.tiwendata.append(sys.TiWen);
         sys.rthtdata.append(sys.ssxl);
         sys.pjhtdata.append(sys.pjxl);
-        sys.xueyadata.append(sys.XueYa_v);
-        sys.xueyaTdata.append(sys.XueYa_T);
         sys.tw_axdata.append(sys.ax);
         sys.tw_aydata.append(sys.ay);
         sys.tw_azdata.append(sys.az);
