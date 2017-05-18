@@ -2,7 +2,7 @@
 #define SYSSETING_H
 
 #include <QDialog>
-
+#include "sys.h"
 namespace Ui {
 class SysSeting;
 }
@@ -14,6 +14,9 @@ class SysSeting : public QDialog
 public:
     explicit SysSeting(QWidget *parent = 0);
     ~SysSeting();
+
+private slots:
+    void on_pushButton_apply_clicked();
 
 private:
     Ui::SysSeting *ui;

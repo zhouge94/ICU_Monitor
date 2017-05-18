@@ -5228,6 +5228,12 @@ color: rgb(255, 255, 0);</string>
                       </item>
                       <item>
                        <widget class="QLabel" name="label_current_time">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="font">
                          <font>
                           <family>Ubuntu</family>
@@ -5738,6 +5744,13 @@ background-color: rgb(95, 0, 71);</string>
                           </property>
                          </widget>
                         </item>
+                        <item>
+                         <widget class="QPushButton" name="pushButton_setting">
+                          <property name="text">
+                           <string>设置</string>
+                          </property>
+                         </widget>
+                        </item>
                        </layout>
                       </item>
                      </layout>
@@ -5818,7 +5831,7 @@ background-color: rgb(95, 0, 71);</string>
     <addaction name="action_minwin"/>
     <addaction name="action_nornalwin"/>
    </widget>
-   <widget class="QMenu" name="menu_5">
+   <widget class="QMenu" name="Data">
     <property name="title">
      <string>数据</string>
     </property>
@@ -5826,7 +5839,7 @@ background-color: rgb(95, 0, 71);</string>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
    <addaction name="menu_3"/>
-   <addaction name="menu_5"/>
+   <addaction name="Data"/>
    <addaction name="menu_4"/>
   </widget>
   <action name="action">
@@ -5882,6 +5895,25 @@ background-color: rgb(95, 0, 71);</string>
   <action name="action_gethard">
    <property name="text">
     <string>获取硬件权限</string>
+   </property>
+  </action>
+  <action name="actionhongwai">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>RR</string>
+   </property>
+  </action>
+  <action name="actionjinhongwai">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>RI</string>
    </property>
   </action>
  </widget>

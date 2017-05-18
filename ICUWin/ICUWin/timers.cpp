@@ -85,9 +85,17 @@ void MainWindow::realtimeDataSlot_show1()
             }
             for(i=i2;i<i3;i++)
             {
-                mb_key=sys.mbridata_t.at(i);
-                vector_mbkey.append(mb_key-StartT_mb);
-                vector_mbdata.append(sys.mbridata.at(i));
+                if(sys.Show_RR_RI)
+                {
+                    mb_key=sys.mbrrdata_t.at(i);
+                    vector_mbkey.append(mb_key-StartT_mb);
+                    vector_mbdata.append(sys.mbrrdata.at(i));
+                }else
+                {
+                    mb_key=sys.mbridata_t.at(i);
+                    vector_mbkey.append(mb_key-StartT_mb);
+                    vector_mbdata.append(sys.mbridata.at(i));
+                }
             }
             for(i=i4;i<i5;i++)
             {

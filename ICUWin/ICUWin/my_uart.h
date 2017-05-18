@@ -37,7 +37,7 @@ private:
     unsigned char sum=0;
     unsigned int index=0;
     unsigned char RecievedState = 0,ChannalNum=0;
-    float *p  = (float*)RecievedByteArray;
+    unsigned int *p  = (unsigned int*)RecievedByteArray;
     float *q = RecievedFloatArray;
 
 };

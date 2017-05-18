@@ -15,7 +15,7 @@ My_Uart::My_Uart()
    index=0;
    RecievedState = 0;
    ChannalNum=0;
-   p = (float*)RecievedByteArray;
+   p = (unsigned int *)RecievedByteArray;
    q = RecievedFloatArray;
    Is_PrintDetail=0;
    for(i=0;i<255;i++)
@@ -339,7 +339,7 @@ unsigned char My_Uart::RecievetoFloatArray(unsigned char Byte)
         RecievedState =0;
         if(sum == Byte)
         {
-            p  = (float*)RecievedByteArray;
+            p  = (unsigned int *)RecievedByteArray;
             q = RecievedFloatArray;
             for(i=0;i<ChannalNum;i++)
             {
@@ -373,7 +373,7 @@ unsigned char My_Uart::RecievetoFloatArray(unsigned char Byte)
         RecievedState =0;
         if(sum == Byte)
         {
-            p  = (float*)(RecievedByteArray+1);
+            p  = (unsigned int *)(RecievedByteArray+1);
             q = RecievedFloatArray;
             q[RecievedByteArray[0]]=*p;
             AddData(RecievedByteArray[0],*p);

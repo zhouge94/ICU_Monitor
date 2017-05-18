@@ -69,6 +69,8 @@ private slots:
     void ConnectUART();
     void on_pushButton_UartAuto_clicked();
 
+    void on_pushButton_setting_clicked();
+
 private:
     My_Uart uart;
     My_Uart uart2;

@@ -3,12 +3,13 @@
 #include "iostream"
 #include "qcustomplot.h"
 sys_S sys;
-void AddData(unsigned char chx,float data)
+void AddData(unsigned char chx,unsigned int data)
 {
     float value,value2;
+    unsigned int temp;
     static double ecg_T=1/sys.ecgrate;
     static double mb_T=1/sys.mbrate;
-    sys.RecievedFloatArray[chx]=data;
+    sys.RecievedFloatArray[chx]=(float)data;
     if(sys.IsBeginRecode)
     {
         switch(chx)
@@ -16,7 +17,7 @@ void AddData(unsigned char chx,float data)
         case 9:
             sys.hxtime+=0.01;
             sys.hxdata_t.append(sys.hxtime);
-            sys.hx=filter_hx.RealFIR(data);;
+            sys.hx=filter_hx.RealFIR((float)data);;
             //sys.hx=(data);;
             sys.hxdata.append(sys.hx);
             sys.hxdata_index_cur=sys.hxdata.count();
@@ -25,7 +26,7 @@ void AddData(unsigned char chx,float data)
             sys.count++;
             sys.ecgtime+=ecg_T;
             if(sys.ecg_hq==0)value2=0;
-            else value2=data;
+            else value2=(float)data;
             //value=filter_ecg.RealFIR(value2);
             value=value2;
             sys.ecgdata.append(value);
@@ -33,27 +34,29 @@ void AddData(unsigned char chx,float data)
             sys.ecgdata_index_cur=sys.ecgdata.count();
             break;
         case 11:
-            sys.ecg_hq=data;
+            sys.ecg_hq=(float)data;
             break;
         case 12:
-            sys.ssxl=data;
+            sys.ssxl=(float)data;
             break;
         case 20:
-            sys.mbtime+=mb_T;
-            sys.mbri=filter_mbri.RealFIR(65536-((int)data)>>16);
-            //sys.mbri=65536-((int)data)>>16;
-            sys.mbridata_t.append(sys.mbtime);
+            temp=data;
+            //sys.mbri=filter_mbri.RealFIR(65536-temp>>16);
+            sys.mbri=65536-temp>>16;
             sys.mbridata.append(sys.mbri);
             sys.mbdata_index_cur=sys.mbridata.count();
-            sys.mbrr=65536-(data&&0x0000ffff);
-            sys.mbrrdata_t.append(sys.mbtime);
+             //printf("%d\n",temp);
+            //sys.mbrr=filter_mbrr.RealFIR(65536-(temp<<16)>>16);
+            sys.mbrr=65536-(temp<<16)>>16;
             sys.mbrrdata.append(sys.mbrr);
+
+            sys.mbtime+=mb_T;
+            sys.mbridata_t.append(sys.mbtime);
+            sys.mbrrdata_t.append(sys.mbtime);
             sys.count2++;
             break;
-        case 21:
-            break;
         case 22:
-            sys.spo2=data;
+            sys.spo2=(float)data;
             break;
         default:
             break;

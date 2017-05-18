@@ -9,11 +9,14 @@ void MainWindow::on_pushButton_savedata_clicked()
 //test for date
 void MainWindow::on_pushButton_2_clicked()
 {
-
-    QString qstring = "lyc_daniel";
-    // msgdialog.show();
     ui_dp.exec();
 }
+
+void MainWindow::on_pushButton_setting_clicked()
+{
+    ui_sysseting.exec();
+}
+
 void MainWindow::on_comboBox_uartpath_2_currentIndexChanged(const QString &arg1)
 {
     ui->lineEdit_uartpath_2->setText(arg1);

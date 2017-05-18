@@ -12,3 +12,15 @@ SysSeting::~SysSeting()
 {
     delete ui;
 }
+
+void SysSeting::on_pushButton_apply_clicked()
+{
+    if(ui->radioButton_showRR->isChecked())
+    {
+        sys.Show_RR_RI=1;
+    }else
+    {
+        sys.Show_RR_RI=0;
+    }
+    this->close();
+}

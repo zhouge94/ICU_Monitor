@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sys.mbrate=250;
     sys.plot_range_TRange_EcgMb=5;
     sys.plot_range_TRange_Hx=30;
+    sys.Show_RR_RI=1;
 
 /////////////////////////////////////////////////////////////////////////////////////////
     filter_mbrr.SetFilterA(fir_mb,50);
