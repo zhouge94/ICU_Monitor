@@ -374,7 +374,6 @@ unsigned char My_Uart::RecievetoFloatArray(unsigned char Byte)
         if(sum == Byte)
         {
             p  = (unsigned int *)(RecievedByteArray+1);
-            q = RecievedFloatArray;
             q[RecievedByteArray[0]]=*p;
             AddData(RecievedByteArray[0],*p);
             return 0xff;
