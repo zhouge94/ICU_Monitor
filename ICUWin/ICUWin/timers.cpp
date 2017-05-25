@@ -76,7 +76,7 @@ void MainWindow::realtimeDataSlot_show1()
 
             for(i=i0;i<i1;i++)
             {
-                //if(!(i%2))
+                if(!(i%2))
                 {
                     ecg_key=sys.ecgdata_t.at(i);
                     vector_ecgkey.append(ecg_key-StartT_ecg);
