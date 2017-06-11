@@ -41,11 +41,11 @@ int FindPeaks::Find(QList<double>in,QList<double>in_key,QList<double> *max_key)
             j++;
         }
     }
-    cout<<"极大值为:"<<endl;
+    //cout<<"极大值为:"<<endl;
     for(int m = 0;m<indMax.size();m++)
     {
         max_key->append(in_key.at(indMax[m]));
-        cout<<"num["<<m<<"]="<<in.at((indMax[m]))<<" key: "<<max_key->last()<<"  ";
+        //cout<<"num["<<m<<"]="<<in.at((indMax[m]))<<" key: "<<max_key->last()<<"  ";
     }
     cout<<endl;
 }

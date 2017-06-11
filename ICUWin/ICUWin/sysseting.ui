@@ -52,7 +52,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+             <widget class="QDoubleSpinBox" name="doubleSpinBox_yundongtime"/>
             </item>
             <item>
              <widget class="QLabel" name="label_11">
@@ -230,7 +230,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="doubleSpinBox">
+             <widget class="QDoubleSpinBox" name="doubleSpinBox_ecgtime">
               <property name="value">
                <double>5.000000000000000</double>
               </property>
@@ -321,9 +321,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+             <widget class="QDoubleSpinBox" name="doubleSpinBox_hxtime">
               <property name="value">
-               <double>30.000000000000000</double>
+               <double>20.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -472,7 +472,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit"/>
+             <widget class="QLineEdit" name="lineEdit_xueya_A">
+              <property name="text">
+               <string>-251</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_15">
@@ -482,7 +486,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_2"/>
+             <widget class="QLineEdit" name="lineEdit_xueya_B">
+              <property name="text">
+               <string>210</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -511,7 +519,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_3"/>
+             <widget class="QLineEdit" name="lineEdit_spo2_A">
+              <property name="text">
+               <string>-39.207</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_18">
@@ -521,15 +533,13 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_4"/>
+             <widget class="QLineEdit" name="lineEdit_spo2_B">
+              <property name="text">
+               <string>126.29</string>
+              </property>
+             </widget>
             </item>
            </layout>
-           <zorder>frame_13</zorder>
-           <zorder>label_16</zorder>
-           <zorder>label_17</zorder>
-           <zorder>lineEdit_3</zorder>
-           <zorder>label_18</zorder>
-           <zorder>lineEdit_4</zorder>
           </widget>
          </item>
         </layout>

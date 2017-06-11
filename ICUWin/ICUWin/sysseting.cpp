@@ -22,5 +22,16 @@ void SysSeting::on_pushButton_apply_clicked()
     {
         sys.Show_RR_RI=0;
     }
+    sys.spo2_A=ui->lineEdit_spo2_A->text().toFloat();
+    sys.spo2_B=ui->lineEdit_spo2_B->text().toFloat();
+    sys.xueya_A=ui->lineEdit_xueya_A->text().toFloat();
+    sys.xueya_B=ui->lineEdit_xueya_B->text().toFloat();
+    sys.plot_range_TRange_Hx=ui->doubleSpinBox_hxtime->value();
+    sys.plot_range_TRange_EcgMb=ui->doubleSpinBox_ecgtime->value();
+    this->close();
+}
+
+void SysSeting::on_pushButton_cancal_clicked()
+{
     this->close();
 }

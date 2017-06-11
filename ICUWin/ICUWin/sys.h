@@ -71,8 +71,15 @@ typedef struct
     double mbri;
     double hx;
     double spo2;
+    double spo2_A;
+    double spo2_B;
+    double xueya;
+    double xueya_ave;
+    double xueya_A;
+    double xueya_B;
     double ax,ay,az,gx,gy,gz;
-
+    double hx_count;
+    double huxilv;
     int uart_ecg_count=0;
     int count;
     int count2;
@@ -93,4 +100,5 @@ float XueYa(void);
 double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t);
 void SaveData(QString filename);
 int myexec(QString cmd, QList<QString> &resvec);
+double XueYang(QList<double> mb_rr,QList<double> mb_ri);
 #endif // SYS_H

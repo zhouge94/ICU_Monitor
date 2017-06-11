@@ -12,6 +12,10 @@ void AddData(unsigned char chx,unsigned int data)
     static unsigned int data_int;
     static float *p_float=(float *)&data_int;
     static float data_float;
+    static float hx_last;
+    static float hx_cur;
+    static float hx_diff;
+    static float hx0=0,hx_t0=0,hx_t1=0;
     data_int=data;
     data_float=*p_float;
     sys.RecievedFloatArray[chx]=data_float;
@@ -21,11 +25,27 @@ void AddData(unsigned char chx,unsigned int data)
         {
         case 9:
             sys.hxtime+=0.01;
-            sys.hxdata_t.append(sys.hxtime);
-            sys.hx=filter_hx.RealFIR(data_float);;
-            //sys.hx=(data);;
-            sys.hxdata.append(sys.hx);
-            sys.hxdata_index_cur=sys.hxdata.count();
+            hx_cur=data_float;
+            if(sys.hxtime>0.01)
+            {
+                sys.hxdata_t.append(sys.hxtime);
+                hx_diff=hx_cur-hx_last;
+                sys.hx=filter_hx.RealFIR(hx_diff);
+                sys.hxdata.append(sys.hx);
+                sys.hxdata_index_cur=sys.hxdata.count();
+                if(sys.hx<=-1200&&hx0>=-1200)
+                {
+                    hx_t1=sys.ecgtime;
+                    if(hx_t1-hx_t0>1)
+                    {
+                        sys.hx_count++;
+                        std::cout<<"HX_COUNT:"<<sys.hx_count<<"*******************"<<std::endl;
+                    }
+                    hx_t0=hx_t1;
+                }
+                hx0=sys.hx;
+            }
+            hx_last=hx_cur;
             break;
         case 10:
             sys.count++;
@@ -103,6 +123,90 @@ float XueYa(void)
     }
 }
 */
+double AC_DC(QList<double>in)
+{
+    QList<int> sign;
+    QList<int> indMax;
+    QList<double>max;
+    QList<int> indMin;
+    QList<double>min;
+    QList<double>AC,DC;
+    int count=in.count();
+    for(int i=1;i<count;i++)          /*相邻值做差：小于0，赋-1  *大于0，赋1  *等于0，赋0   */
+    {
+        double diff = in.at(i) - in.at(i-1);
+        if(diff>0)sign.append(1);
+        else if(diff<0)sign.append(-1);
+        else sign.append(0);
+    }
+    for(int j=1;j<sign.size();j++)  //再对sign相邻位做差  //保存max的位置
+    {
+        int diff = sign[j]-sign[j-1];
+        if(diff<0) indMax.push_back(j);
+    }
+    for(int j=1;j<sign.size();j++)  //再对sign相邻位做差  //保存min的位置
+    {
+        int diff = sign[j]-sign[j-1];
+        if(diff>0) indMin.push_back(j);
+    }
+
+    for(int j=0;j<indMax.count()-1;) //recheck max
+    {
+        if(indMax.at(j+1)-indMax.at(j)<100)
+        {
+            if(in.at(indMax[j])>in.at(indMax[j+1]))indMax.removeAt(j+1);
+            else indMax.removeAt(j);
+        }else
+        {
+            j++;
+        }
+    }
+    for(int j=0;j<indMin.count()-1;) //recheck min
+    {
+        if(indMin.at(j+1)-indMin.at(j)<100)
+        {
+            if(in.at(indMin[j])<in.at(indMin[j+1]))indMin.removeAt(j+1);
+            else indMin.removeAt(j);
+        }else
+        {
+            j++;
+        }
+    }
+    if(indMin[0]<indMax[0])indMin.removeAt(0);
+    for(int m = 0;m<indMax.size();m++)
+    {
+        max.append(in.at(indMax[m]));
+    }
+    for(int m = 0;m<indMin.size();m++)
+    {
+        if(m>indMax.size())break;
+        min.append(in.at(indMin[m]));
+        AC.append(max[m]-min[m]);
+        DC.append((max[m]+min[m])/2);
+    }
+    double ave_ac,ave_dc;
+    ave_ac=ZhongZhiFilter(1,AC);
+    ave_dc=65536.0-ZhongZhiFilter(1,DC);
+    std::cout<<"  AVEAC:"<<ave_ac<<" ";
+    std::cout<<"  AVEDC:"<<ave_dc<<" ";
+    std::cout<<std::endl;
+    return ave_ac/ave_dc;
+
+}
+double XueYang(QList<double> mb_rr,QList<double> mb_ri)
+{
+    std::cout<<"Begin XueYang Cal----------------------------------"<<std::endl;
+    double R1,R2,R;
+    R1=AC_DC(mb_rr);
+    R2=AC_DC(mb_ri);
+    R=R1/R2;
+    sys.spo2=sys.spo2_A*R+sys.spo2_B;
+    std::cout<<"  R:"<<R<<" SPO2:"<<sys.spo2<<std::endl;
+    if(sys.spo2>100)sys.spo2=100;
+    std::cout<<"Begin XueYang Cal----------------------------------"<<std::endl;
+    std::cout<<"End XueYang Cal----------------------------------"<<std::endl;
+
+}
 double XueYa_T(QList<double>ecg_max_t,QList<double>mb_max_t)
 {
     QList<double> T;
@@ -169,7 +273,7 @@ void SaveData(QString filename)
         a.append(QString("%1").arg(sys.xueya_t.at(i),7,'f',6,' '));
         a.append(QString("%1").arg(sys.xueya_dataT.at(i),12,'f',2,' '));
         a.append(QString("%1").arg(sys.xueya_data.at(i),12,'f',2,' '));
-        mb_sheet.data.append(a);
+        xueya_sheet.data.append(a);
     }
     fd.generateCSV(QString("Data/")+filename+QString("_xueya.csv"),xueya_sheet);
     //save huxi data

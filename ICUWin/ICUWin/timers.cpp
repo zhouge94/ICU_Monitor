@@ -13,10 +13,12 @@ void MainWindow::realtimeDataSlot_show1()
     QVector<double> vector_ecgdata;
     QVector<double> vector_mbkey;
     QVector<double> vector_mbdata;
+    QVector<double> vector_mbdata2;
     QVector<double> vector_hxkey;
     QVector<double> vector_hxdata;
     static QCPItemTracer *ecgTracer = new QCPItemTracer(ui->plot1_xinlv);
     static QCPItemTracer *mbTracer = new QCPItemTracer(ui->plot1_tiwei);
+    static QCPItemTracer *mbTracer2 = new QCPItemTracer(ui->plot1_tiwei);
     static QCPItemTracer *hxTracer = new QCPItemTracer(ui->plot1_huxi);
     static double StartT_ecg;
     static double StartT_mb;
@@ -43,6 +45,13 @@ void MainWindow::realtimeDataSlot_show1()
                 mbTracer->setBrush(Qt::green);
                 mbTracer->setSize(10);
 
+                mbTracer2->setGraph(ui->plot1_tiwei->graph(1));
+                mbTracer2->setInterpolating(true);
+                mbTracer2->setStyle(QCPItemTracer::tsCircle);
+                mbTracer2->setPen(QPen(Qt::green));
+                mbTracer2->setBrush(Qt::green);
+                mbTracer2->setSize(10);
+
                 hxTracer->setGraph(ui->plot1_huxi->graph(0));
                 hxTracer->setInterpolating(true);
                 hxTracer->setStyle(QCPItemTracer::tsCircle);
@@ -51,6 +60,8 @@ void MainWindow::realtimeDataSlot_show1()
                 hxTracer->setSize(10);
 
                 ui->plot1_xinlv->yAxis->setRange(-5000,15000);
+                ui->plot1_tiwei->yAxis->setRange(0,65536);
+                ui->plot1_huxi->yAxis->setRange(-3500,3500);
                 ui->plot1_xinlv->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
                 ui->plot1_tiwei->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
                 ui->plot1_huxi->xAxis->setRange(0,sys.plot_range_TRange_Hx);
@@ -85,17 +96,10 @@ void MainWindow::realtimeDataSlot_show1()
             }
             for(i=i2;i<i3;i++)
             {
-                if(sys.Show_RR_RI)
-                {
-                    mb_key=sys.mbrrdata_t.at(i);
-                    vector_mbkey.append(mb_key-StartT_mb);
-                    vector_mbdata.append(sys.mbrrdata.at(i));
-                }else
-                {
-                    mb_key=sys.mbridata_t.at(i);
-                    vector_mbkey.append(mb_key-StartT_mb);
-                    vector_mbdata.append(sys.mbridata.at(i));
-                }
+                mb_key=sys.mbrrdata_t.at(i);
+                vector_mbkey.append(mb_key-StartT_mb);
+                vector_mbdata.append(sys.mbrrdata.at(i));
+                vector_mbdata2.append(sys.mbridata.at(i));
             }
             for(i=i4;i<i5;i++)
             {
@@ -116,7 +120,10 @@ void MainWindow::realtimeDataSlot_show1()
             {
                 ui->plot1_tiwei->graph(0)->data().data()->remove(vector_mbkey.first(),vector_mbkey.last()+0.02);
                 ui->plot1_tiwei->graph(0)->addData(vector_mbkey,vector_mbdata);
+                ui->plot1_tiwei->graph(1)->data().data()->remove(vector_mbkey.first(),vector_mbkey.last()+0.02);
+                ui->plot1_tiwei->graph(1)->addData(vector_mbkey,vector_mbdata2);
                 mbTracer->setGraphKey(vector_mbkey.last());
+                mbTracer2->setGraphKey(vector_mbkey.last());
                 //ui->plot1_tiwei->graph(0)->rescaleValueAxis(false,true);
             }
             if(vector_hxkey.count()>0)
@@ -124,7 +131,7 @@ void MainWindow::realtimeDataSlot_show1()
                 ui->plot1_huxi->graph(0)->data().data()->remove(vector_hxkey.first(),vector_hxkey.last()+0.1);
                 ui->plot1_huxi->graph(0)->addData(vector_hxkey,vector_hxdata);
                 hxTracer->setGraphKey(vector_hxkey.last());
-                ui->plot1_huxi->graph(0)->rescaleValueAxis(true,false);
+                //ui->plot1_huxi->graph(0)->rescaleValueAxis(false,false);
             }
 
             lastPointKey = key;
@@ -157,7 +164,7 @@ void MainWindow::realtimeDataSlot_show1()
                     else ui->plot1_xinlv->yAxis->setRange(mapminmax_t->xmin-mapminmax_t->xrange*0.1,mapminmax_t->xmax+mapminmax_t->xrange*0.1);
                 }
                 LastmbPointKey=key;
-                QList<double>mb_t_temp,mb_d_temp,mb_d_temp_1;
+                QList<double>mb_t_temp,mb_d_temp,mb_d_temp_1,mb_d2_temp,mb_d2_temp_1;
                 if(vector_mbkey.count()>0)
                 {
                     StartT_mb=mb_key;
@@ -167,13 +174,37 @@ void MainWindow::realtimeDataSlot_show1()
                     {
                         mb_t_temp.append(ui->plot1_tiwei->graph(0)->data().data()->at(i)->key);
                         mb_d_temp.append(ui->plot1_tiwei->graph(0)->data().data()->at(i)->value);
+                        mb_d2_temp.append(ui->plot1_tiwei->graph(1)->data().data()->at(i)->value);
                     }
                     MapMinMax *mapminmax_t=new MapMinMax;
+                    MapMinMax *mapminmax_t2=new MapMinMax;
                     mapminmax_t->GetMinMax(mb_d_temp);
                     mapminmax_t->Change(mb_d_temp,&mb_d_temp_1);
-                    if(mapminmax_t->xmax==0&&mapminmax_t->xmin==0)ui->plot1_tiwei->yAxis->setRange(-10000,10000);
-                    else if(mapminmax_t->xrange<500)ui->plot1_tiwei->yAxis->setRange(mapminmax_t->averge-1000,mapminmax_t->averge+1000);
-                    else ui->plot1_tiwei->yAxis->setRange(mapminmax_t->xmin-mapminmax_t->xrange*0.5,mapminmax_t->xmax+mapminmax_t->xrange*0.5);
+                    mapminmax_t2->GetMinMax(mb_d2_temp);
+                    mapminmax_t2->Change(mb_d2_temp,&mb_d2_temp_1);
+                    if(sys.Show_RR_RI)
+                    {
+                        if(mapminmax_t->xmax==0&&mapminmax_t->xmin==0)ui->plot1_tiwei->yAxis->setRange(-10000,10000);
+                        else if(mapminmax_t->xrange<500)ui->plot1_tiwei->yAxis->setRange(mapminmax_t->averge-1000,mapminmax_t->averge+1000);
+                        else ui->plot1_tiwei->yAxis->setRange(mapminmax_t->xmin-mapminmax_t->xrange*0.5,mapminmax_t->xmax+mapminmax_t->xrange*0.5);
+                    }
+                    else
+                    {
+                        if(mapminmax_t2->xmax==0&&mapminmax_t2->xmin==0)ui->plot1_tiwei->yAxis->setRange(-10000,10000);
+                        else if(mapminmax_t2->xrange<500)ui->plot1_tiwei->yAxis->setRange(mapminmax_t2->averge-1000,mapminmax_t2->averge+1000);
+                        else ui->plot1_tiwei->yAxis->setRange(mapminmax_t2->xmin-mapminmax_t2->xrange*0.5,mapminmax_t2->xmax+mapminmax_t2->xrange*0.5);
+                    }
+                    {
+                       double R=0,AC_RR=0,AC_RI=0,DC_RR=0,DC_RI=0;
+                       AC_RR=mapminmax_t->xrange;
+                       DC_RR=mapminmax_t->averge;
+                       AC_RI=mapminmax_t2->xrange;
+                       DC_RI=mapminmax_t2->averge;
+                       R=(AC_RI/DC_RI)/(AC_RR/DC_RR);
+                       printf("ACRR=%f,ACRI=%f\nDCRR=%f,DCRI=%f,\n",AC_RR,AC_RI,DC_RR,DC_RI);
+                       printf("R=%f\n",R);
+                       XueYang(mb_d_temp,mb_d2_temp);
+                    }
                 }
                 FindPeaks *myfindpeaks =new FindPeaks;
                 QList<double>mb_max_t,ecg_max_t;
@@ -184,9 +215,9 @@ void MainWindow::realtimeDataSlot_show1()
                 double xueya_t=XueYa_T(ecg_max_t,mb_max_t);
                 if(xueya_t>0)
                 {
-                    double XueYa_v=xueya_t*100;
+                    sys.xueya=xueya_t*sys.xueya_A+sys.xueya_B;
                     OutOneinfo(QString("有效脉搏波延时时间： %1 s").arg(xueya_t));
-                    sys.xueya_data.append(XueYa_v);
+                    sys.xueya_data.append(sys.xueya);
                     sys.xueya_dataT.append(xueya_t);
                     sys.xueya_t.append(sys.ecgtime);
                 }
@@ -194,12 +225,33 @@ void MainWindow::realtimeDataSlot_show1()
                 {
                     OutOneinfo("无效");
                 }
+                ui->plot1_xinlv->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
+                ui->plot1_tiwei->xAxis->setRange(0,sys.plot_range_TRange_EcgMb);
 
             }
             if(key-LastHxPointKey > sys.plot_range_TRange_Hx)
             {
-                StartT_hx=hx_key;
                 LastHxPointKey=key;
+                QList<double>hx_t_temp,hx_d_temp,hx_d_temp_1;
+                if(vector_hxkey.count()>0)
+                {
+                    StartT_hx=hx_key;
+                    ui->plot1_huxi->graph(0)->data().data()->removeAfter(sys.plot_range_TRange_Hx);
+                    int count=ui->plot1_huxi->graph(0)->data().data()->size();
+                    for(i=10;i<count-10;i++)
+                    {
+                        hx_t_temp.append(ui->plot1_huxi->graph(0)->data().data()->at(i)->key);
+                        hx_d_temp.append(ui->plot1_huxi->graph(0)->data().data()->at(i)->value);
+                    }
+                    MapMinMax *mapminmax_t=new MapMinMax;
+                    mapminmax_t->GetMinMax(hx_d_temp);
+                    mapminmax_t->Change(hx_d_temp,&hx_d_temp_1);
+                    sys.huxilv=sys.hx_count/sys.plot_range_TRange_Hx*60;
+                    sys.hx_count=0;
+
+                 }
+                ui->plot1_huxi->xAxis->setRange(0,sys.plot_range_TRange_Hx);
+
             }
             ui->plot1_xinlv->replot();
             ui->plot1_huxi->replot();
@@ -253,7 +305,8 @@ void MainWindow::UartCallback()
 }
 void MainWindow::SecondCallBack()
 {
-    static int count,pjxl_sum,i;
+    static int count,pjxl_sum,i,count_hx;
+    static double hx_t0;
     if(count++<20)pjxl_sum+=sys.ssxl;
     else
     {
@@ -271,8 +324,9 @@ void MainWindow::SecondCallBack()
     ui->show1_ssxl->setText(QString("%1").arg(sys.ssxl,5,'f',1,' '));
     ui->show1_pjxl->setText(QString("%1").arg(sys.pjxl,5,'f',1,' '));
     ui->show1_jkzk->setText(QString("%1").arg(sys.spo2,5,'f',1,' '));
-    if(sys.xueya_data.count())ui->show1_ssy->setText(QString("%1").arg(sys.xueya_data.last(),5,'f',1,' '));
-    if(sys.xueya_data.count())ui->show1_szy->setText(QString("%1").arg(sys.xueya_data.last(),5,'f',1,' '));
+    ui->show1_hxl->setText(QString("%1").arg(sys.huxilv,5,'f',1,' '));
+    if(sys.xueya_data.count())ui->show1_ssy->setText(QString("%1").arg(sys.xueya,5,'f',1,' '));
+    if(sys.xueya_data.count())ui->show1_szy->setText(QString("%1").arg(sys.xueya,5,'f',1,' '));
     QString tiwei;
     if(sys.ax>=sys.ay&&sys.ax>=sys.az)
     {

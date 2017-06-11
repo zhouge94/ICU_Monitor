@@ -18,6 +18,8 @@ public:
 private slots:
     void on_pushButton_apply_clicked();
 
+    void on_pushButton_cancal_clicked();
+
 private:
     Ui::SysSeting *ui;
 };
