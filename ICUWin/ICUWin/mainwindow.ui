@@ -57,7 +57,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideLeft</enum>
@@ -329,10 +329,10 @@
                     </size>
                    </property>
                    <property name="minimum">
-                    <double>-9999.000000000000000</double>
+                    <double>-9999999999.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>9999.000000000000000</double>
+                    <double>9999999999.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>
@@ -1687,8 +1687,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>800</width>
-             <height>35</height>
+             <width>1061</width>
+             <height>455</height>
             </rect>
            </property>
            <property name="styleSheet">
@@ -3448,7 +3448,7 @@
                   <item>
                    <widget class="QPushButton" name="Bt_UartConect">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
